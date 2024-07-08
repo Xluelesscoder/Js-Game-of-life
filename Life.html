@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game of Life</title>
+
+</head><body>
+<canvas id="GOL" width="1280" height="720"></canvas>
+</body>
+<style>
+    *{
+        margin: 0px;
+        padding: 0px;
+    }
+</style>
+<script>
+    GOL = document.getElementById("GOL").getContext("2d");
+    document.getElementById("GOL").width = window.innerWidth
+    document.getElementById("GOL").height = window.innerHeight
+     width = document.getElementById("GOL").width;
+     height = document.getElementById("GOL").height;
+    size = 5
+
+    draw =(x,y,c,s)=>{
+        GOL.fillStyle = c
+        GOL.fillRect(x,y,s,s)
+    }
+    grid = []
+    tmpgrid = []
+
+    cellValue= (x,y) =>{
+        try {
+            return grid[x][y]
+        }
+        catch{
+            return 0;
+        }
+    }
+
+    countNeighbours = (x,y) => {
+        count = 0
+        if(cellValue(x-1,y)) count ++
+        if(cellValue(x+1,y)) count ++
+        if(cellValue(x,y-1)) count ++
+        if(cellValue(x,y+1)) count ++
+        if(cellValue(x-1,y-1)) count ++
+        if(cellValue(x+1,y+1)) count ++
+        return count
+    }
+
+     updateCell = (x,y) => {
+               neighbours = countNeighbours(x,y)
+               if(neighbours > 4 || neighbours < 3) return 0
+               if(grid[x][y]== 0 && neighbours == 3) return 1
+               return grid[x][y]
+     }
+
+
+    update = () => {
+        GOL.clearRect(0,0,width,height)
+        draw(0,0,"black",width)
+        for(let x = 0; x < width/size; x++){
+            for(let y = 0; y<height/size; y++){
+                tmpgrid[x][y]= updateCell(x,y)
+            }
+        }
+        grid = tmpgrid
+        var cnt = 0
+        for(let x=0; x<width/size; x++){
+            for(let y=0; y<height/size;y++){
+                if(grid[x][y]){
+                    draw(x*size,y*size,'red',size)
+                    cnt+=1
+                }
+            }
+        }
+        if(((width/size)*(height/size))/cnt > 96) init()
+       setTimeout(()=> {requestAnimationFrame(update)}, 50 );
+    }
+
+    initArray=(w,h)=>{
+               arr=[]
+               for (let x=0; x < w; x++){
+                arr[x]=[]
+                for (let y = 0; y < h; y++){
+                         arr[x][y]=0;
+                }
+               }
+             return arr
+
+    }
+
+    init = () => {
+          grid = initArray(width/size, height/size)
+          tmpgrid = initArray(width/size, height/size)
+          for (let x = 0; x < width/size; x++){
+            for (let y = 0; y < height/size; y++){
+               if(Math.random() > 0.5) grid[x][y] = 1;
+            }
+          }
+          update()
+    } 
+    
+    init()
+</script>
+
+</html>
